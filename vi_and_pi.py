@@ -111,6 +111,7 @@ def policy_improvement(P, nS, nA, value_from_policy, policy, gamma=0.9):
 			if action_state_value >= max_action_state_value:
 				max_action_state_value = action_state_value
 				max_act = action
+				# argmax
 		new_policy[state] = max_act
 
 	############################
