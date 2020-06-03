@@ -144,7 +144,7 @@ def policy_iteration(P, nS, nA, gamma=0.9, tol=10e-3):
 		value_function = policy_evaluation(P,nS,nA,policy,gamma=0.9, tol=1e-3)
 		# back up policy before improve it
 		old_policy = policy
-		policy = policy_improvement(P, nS, nA, value_function, policy,gamma=0.9)
+		policy = policy_improvement(P, nS, nA, value_function, policy, gamma=0.9)
 		for state in range(nS):
 			if old_policy[state] != policy[state]:
 				policy_stable = False
@@ -247,8 +247,8 @@ def render_single(env, policy, max_steps=100):
 if __name__ == "__main__":
 
 	# comment/uncomment these lines to switch between deterministic/stochastic environments
-	env = gym.make("Deterministic-4x4-FrozenLake-v0")
-	# env = gym.make("Stochastic-4x4-FrozenLake-v0")
+	#env = gym.make("Deterministic-4x4-FrozenLake-v0")
+	env = gym.make("Stochastic-4x4-FrozenLake-v0")
 
 	print("\n" + "-"*25 + "\nBeginning Policy Iteration\n" + "-"*25)
 
