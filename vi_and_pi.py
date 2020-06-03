@@ -101,18 +101,16 @@ def policy_improvement(P, nS, nA, value_from_policy, policy, gamma=0.9):
 	############################
 	# YOUR IMPLEMENTATION HERE #
 
+	# algorithm of policy improvements involve choosing the action that maximize q(s,a)
+	# reference to Ashley's code by creating an array for each state
 	for state in range(nS):
-		action_state_value = 0
-		max_act = 0
-		max_action_state_value = 0
+		# q(s,a) for each possible action for each state
+		Q_value = np.zeros(nA)
 		for action in range(nA):
 			for probability, nextstate, reward, terminal in P[state][action]:
-				action_state_value += probability * (reward + gamma * value_from_policy[nextstate])
-			if action_state_value >= max_action_state_value:
-				max_action_state_value = action_state_value
-				max_act = action
-				# argmax
-		new_policy[state] = max_act
+				Q_value[action] += probability * (reward + gamma * value_from_policy[nextstate])
+		new_policy[state] = np.argmax(Q_value)
+
 
 	############################
 	return new_policy
@@ -141,21 +139,27 @@ def policy_iteration(P, nS, nA, gamma=0.9, tol=10e-3):
 
 	############################
 	# YOUR IMPLEMENTATION HERE #
-
 	policy_stable = False
 	while not policy_stable:
-		value_function = policy_evaluation(P, nS, nA, policy, gamma=0.9, tol=1e-3)
-		old_action = policy
-		new_policy = policy_improvement(P, nS, nA, value_function, policy)
+		value_function = policy_evaluation(P,nS,nA,policy,gamma=0.9, tol=1e-3)
+		# back up policy before improve it
+		old_policy = policy
+		policy = policy_improvement(P, nS, nA, value_function, policy,gamma=0.9)
 		for state in range(nS):
-			if old_action[state] != new_policy[state]:
+			if old_policy[state] != policy[state]:
 				policy_stable = False
 				break
 			policy_stable = True
-		policy = new_policy
+
 
 	############################
 	return value_function, policy
+
+
+
+
+
+
 
 def value_iteration(P, nS, nA, gamma=0.9, tol=1e-3):
 	"""
@@ -184,33 +188,25 @@ def value_iteration(P, nS, nA, gamma=0.9, tol=1e-3):
 		delta = 0
 		for state in range(nS):
 			v = value_function[state]
-			action_state_value = 0
-			max_action_state_value = 0
+			Q_value = np.zeros(nA)
+			# loop through all possible tuples
 			for action in range(nA):
 				for probability, nextstate, reward, terminal in P[state][action]:
-					action_state_value += probability * (reward + gamma * value_function[nextstate])
-				if action_state_value > max_action_state_value:
-					max_action_state_value = action_state_value
-			value_function[state] = max_action_state_value
+					Q_value[action] += probability * (reward + gamma * value_function[nextstate])
+			value_function[state] = max(Q_value)
 			delta = max(delta, np.abs(v - value_function[state]))
 		if delta < tol:
 			terminate = True
 		else:
 			terminate = False
 
+	# use the optimal value function updated in previous code
 	for state in range(nS):
-		action_state_value = 0
-		max_act = 0
-		max_action_state_value = 0
+		Q_value = np.zeros(nA)
 		for action in range(nA):
 			for probability, nextstate, reward, terminal in P[state][action]:
-				action_state_value += probability * (reward + gamma * value_function[nextstate])
-			if action_state_value >= max_action_state_value:
-				max_action_state_value = action_state_value
-				max_act = action
-		policy[state] = max_act
-
-
+				Q_value[action] += probability * (reward + gamma * value_function[nextstate])
+		policy[state] = np.argmax(Q_value)
 	############################
 	return value_function, policy
 
@@ -274,5 +270,3 @@ if __name__ == "__main__":
 	print(V_vi)
 	print("Value Iteration Policy: ")
 	print(p_vi)
-
-# not finished
